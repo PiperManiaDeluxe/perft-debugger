@@ -1,0 +1,9 @@
+[package]
+name = "perft-debugger"
+version = "1.0.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+cozy-chess = "0.3.4"
