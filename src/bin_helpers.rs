@@ -27,12 +27,6 @@ pub fn parse_move(move_uci: &str) -> Result<Move> {
         .context("Error while parsing move from UCI string")
 }
 
-/// TODO: Docs
-pub fn uci_from_cozy(mv: &Move, board: &Board) -> String {
-    remap_castling_move(board, mv);
-    mv.to_string()
-}
-
 /// Returns a [`cozy_chess::Move`] with castling remapped to proper UCI spec.
 ///
 /// [`cozy_chess`] defines castling as the king moving to the rook's square. \
@@ -41,22 +35,22 @@ pub fn uci_from_cozy(mv: &Move, board: &Board) -> String {
 /// # Arguments
 ///
 /// * `board`: Board that the move __will__ be played on.
-/// * `mv`: Move to check.
-pub fn remap_castling_move(board: &Board, mv: &Move) -> Move {
-    if !move_is_cozy_castling(board, mv) {
-        return mv.clone();
+/// * `cozy_move`: Move to check.
+pub fn remap_castling_move(board: &Board, cozy_move: &Move) -> Move {
+    if !move_is_cozy_castling(board, cozy_move) {
+        return cozy_move.clone();
     };
 
     // This move has to be a castling move, remap the move.
-    let mut remapped_move = mv.clone();
+    let mut remapped_move = cozy_move.clone();
 
-    let destination = if mv.to.file() == File::A {
+    let destination = if cozy_move.to.file() == File::A {
         Square::C1
     } else {
         Square::G1
     };
 
-    let white_king = board.color_on(mv.from) == Some(Color::White);
+    let white_king = board.color_on(cozy_move.from) == Some(Color::White);
     if !white_king {
         remapped_move.to = destination.flip_rank();
     } else {
@@ -74,20 +68,20 @@ pub fn remap_castling_move(board: &Board, mv: &Move) -> Move {
 /// # Arguments
 ///
 /// * `board`: Board that the move __will__ be played on.
-/// * `mv`: Move to check.
-pub fn move_is_cozy_castling(board: &Board, mv: &Move) -> bool {
-    let king_moved = board.piece_on(mv.from) == Some(Piece::King);
-    let rook_attacked = board.piece_on(mv.to) == Some(Piece::Rook);
+/// * `cozy_move`: Move to check.
+pub fn move_is_cozy_castling(board: &Board, cozy_move: &Move) -> bool {
+    let king_moved = board.piece_on(cozy_move.from) == Some(Piece::King);
+    let rook_attacked = board.piece_on(cozy_move.to) == Some(Piece::Rook);
 
     if !(king_moved && rook_attacked) {
         // Cozy chess maps castling as the king attacking the castling rook.
         return false;
     }
 
-    let white_king = board.color_on(mv.from) == Some(Color::White);
+    let white_king = board.color_on(cozy_move.from) == Some(Color::White);
     let king_start_square = if white_king { Square::E1 } else { Square::E8 };
 
-    let king_on_start = mv.from == king_start_square;
+    let king_on_start = cozy_move.from == king_start_square;
     if !king_on_start {
         // The king must be on its starting square to castle.
         return false;
@@ -95,7 +89,7 @@ pub fn move_is_cozy_castling(board: &Board, mv: &Move) -> bool {
 
     // We can ignore the specific castling side.
     // If the rook and king are already two files away, the move *has* to be castling.
-    let rook_on_starting_file = mv.to.file() == File::A || mv.to.file() == File::H;
+    let rook_on_starting_file = cozy_move.to.file() == File::A || cozy_move.to.file() == File::H;
     if !rook_on_starting_file {
         // The rook must be on its starting file to castle.
         return false;

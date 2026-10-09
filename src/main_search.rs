@@ -47,13 +47,13 @@ pub fn do_main_search(
             report.offending_move.report_fail_reason();
 
             print!("moves ");
-            for mv in &report.path {
-                print!("{} ", mv.to_string());
-                full_path.push(*mv);
+            for uci_move in &report.path {
+                print!("{} ", uci_move.to_string());
+                full_path.push(*uci_move);
             }
             println!("");
 
-            full_path.push(report.offending_move.mv);
+            full_path.push(report.offending_move.uci_move);
         }
 
         reported_lines.push(full_path);

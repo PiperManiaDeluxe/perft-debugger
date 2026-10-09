@@ -46,7 +46,7 @@ impl fmt::Display for DebugResult {
                 writeln!(
                     f,
                     "Failing move found:\n  {}",
-                    failing_leaf_report.offending_move.mv
+                    failing_leaf_report.offending_move.uci_move
                 )?;
                 writeln!(
                     f,
@@ -58,8 +58,13 @@ impl fmt::Display for DebugResult {
                     f,
                     "Fail start condition:\n  position fen {fail_start_position_fen}"
                 )?;
-                for mv in &failing_leaf_report.path {
-                    write!(f, "{} ", mv)?;
+
+                if !failing_leaf_report.path.is_empty() {
+                    write!(f, " moves ")?;
+                }
+
+                for uci_move in &failing_leaf_report.path {
+                    write!(f, "{} ", uci_move)?;
                 }
                 writeln!(f)?;
             }

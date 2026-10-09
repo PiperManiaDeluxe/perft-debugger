@@ -39,8 +39,8 @@ pub fn debug_perft_provider(
 
     let mut ignored_initial_moves = vec![];
     for line in ignored_lines {
-        for mv in line {
-            ignored_initial_moves.push(*mv);
+        for uci_move in line {
+            ignored_initial_moves.push(*uci_move);
             break;
         }
     }

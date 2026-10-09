@@ -24,12 +24,13 @@ impl PerftProvider for CozyChessPerftTarget {
             .context("Failed to parse `position_fen` as cozy_chess::Board")?;
 
         // Play the moves to this point
-        for mv in position_moves {
-            let mv = parse_move(&mv.to_string())
+        for uci_move in position_moves {
+            let cozy_move = parse_move(&uci_move.to_string())
                 .context("Failed to parse a move in `position_moves` as cozy_chess::Move")?;
 
-            // TODO: We might want the checked variant
-            board.play_unchecked(mv);
+            if let Err(err) = board.try_play(cozy_move) {
+                return Err(format!("Failed to play move: {cozy_move}. Error: {err}").into());
+            }
         }
 
         let mut results = PerMovePerftResult::default();
@@ -49,7 +50,7 @@ impl PerftProvider for CozyChessPerftTarget {
 
                 results.total_nodes += nodes;
                 results.moves.push(SingleMovePerftResult {
-                    mv: reported_move,
+                    uci_move: reported_move,
                     nodes,
                 });
             }

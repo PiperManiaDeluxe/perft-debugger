@@ -20,7 +20,7 @@ pub fn compare_perft_results(
     let mut failing_moves = vec![];
 
     // Converts a move result struct into a key-pair tuple
-    let move_result_to_tuple = |result: &SingleMovePerftResult| (result.mv, result.nodes);
+    let move_result_to_tuple = |result: &SingleMovePerftResult| (result.uci_move, result.nodes);
 
     let expected_key_pairs = expected.moves.iter().map(move_result_to_tuple);
     let mut expected_move_table: HashMap<UCIMove, usize> = HashMap::from_iter(expected_key_pairs);
@@ -34,13 +34,13 @@ pub fn compare_perft_results(
     }
 
     // Any moves remaining in expected_move_table is a missing move
-    for (mv, nodes) in expected_move_table {
-        if ignored_moves.contains(&mv) {
+    for (uci_move, nodes) in expected_move_table {
+        if ignored_moves.contains(&uci_move) {
             continue;
         }
 
         failing_moves.push(FailedMove {
-            mv,
+            uci_move,
             expected_nodes: nodes,
             reported_nodes: 0,
         });
@@ -55,11 +55,11 @@ fn compare_single_result(
     reported_result: SingleMovePerftResult,
     ignored_moves: &[UCIMove],
 ) -> Option<FailedMove> {
-    if ignored_moves.contains(&reported_result.mv) {
+    if ignored_moves.contains(&reported_result.uci_move) {
         return None;
     }
 
-    match expected_move_table.remove(&reported_result.mv) {
+    match expected_move_table.remove(&reported_result.uci_move) {
         Some(expected_nodes) if expected_nodes == reported_result.nodes => {
             // Legal move!
             None
@@ -67,7 +67,7 @@ fn compare_single_result(
         Some(expected_nodes) => {
             // Mismatched move
             Some(FailedMove {
-                mv: reported_result.mv,
+                uci_move: reported_result.uci_move,
                 expected_nodes,
                 reported_nodes: reported_result.nodes,
             })
@@ -75,7 +75,7 @@ fn compare_single_result(
         None => {
             // Illegal move
             Some(FailedMove {
-                mv: reported_result.mv,
+                uci_move: reported_result.uci_move,
                 expected_nodes: 0,
                 reported_nodes: reported_result.nodes,
             })

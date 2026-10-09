@@ -57,7 +57,7 @@ pub fn find_failing_leaf(
         }
 
         let mut full_line = path.clone();
-        full_line.push(failed_move.mv);
+        full_line.push(failed_move.uci_move);
 
         let already_reported = reported_lines.iter().any(|line| line == &full_line);
 
@@ -81,7 +81,7 @@ pub fn find_failing_leaf(
         }
 
         let mut leaf_path = path.clone();
-        leaf_path.push(failed_move.mv);
+        leaf_path.push(failed_move.uci_move);
 
         let expected = true_perft
             .perft(start_position_fen, &leaf_path, depth - 1)

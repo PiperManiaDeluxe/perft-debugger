@@ -1,10 +1,13 @@
 // TODO: Docs
 
-use std::fmt::{self, Write};
+use std::{
+    fmt::{self, Write},
+    str::FromStr,
+};
 
 use cozy_chess::{Board, Move, Piece};
 
-use crate::bin_helpers::remap_castling_move;
+use crate::{bin_helpers::remap_castling_move, perft::perft_provider::PerftError};
 
 /// A chess move as it's described by
 /// [Universal Chess Interface](https://en.wikipedia.org/wiki/Universal_Chess_Interface)
@@ -28,27 +31,6 @@ pub struct UCIMove {
 }
 
 impl UCIMove {
-    // TODO: Replace with an actual from str impl
-    pub fn from_str_unwrap(s: &str) -> Self {
-        let squares = [&s[0..=1], &s[2..=3]];
-        let [from, to] = squares.map(square_from_name);
-
-        let promo_char = s.chars().last().expect("String is empty");
-        let promotion = match promo_char {
-            'n' => Some(PromotionPiece::Knight),
-            'b' => Some(PromotionPiece::Bishop),
-            'r' => Some(PromotionPiece::Rook),
-            'q' => Some(PromotionPiece::Queen),
-            _ => None,
-        };
-
-        Self {
-            from,
-            to,
-            promotion,
-        }
-    }
-
     /// TODO: Docs
     pub(crate) fn from_cozy(board: &Board, cozy_mv: &Move) -> Self {
         let cozy_mv = remap_castling_move(board, cozy_mv);
@@ -88,6 +70,32 @@ impl fmt::Debug for UCIMove {
             .field("to", &square_to_name(self.to))
             .field("promotion", &self.promotion)
             .finish()
+    }
+}
+
+impl FromStr for UCIMove {
+    type Err = PerftError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let squares = [&s[0..=1], &s[2..=3]];
+        let [from, to] = squares.map(square_from_name);
+
+        let Some(promo_char) = s.chars().last() else {
+            return Err("String is empty".into());
+        };
+        let promotion = match promo_char {
+            'n' => Some(PromotionPiece::Knight),
+            'b' => Some(PromotionPiece::Bishop),
+            'r' => Some(PromotionPiece::Rook),
+            'q' => Some(PromotionPiece::Queen),
+            _ => None,
+        };
+
+        Ok(Self {
+            from,
+            to,
+            promotion,
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use std::str::FromStr;
 
 use crate::{
     bin_helpers::string_is_uci_move,
@@ -10,7 +10,18 @@ use crate::{
     },
 };
 
-/// TODO: Docs?
+/// Implements [`PerftProvider`] by requesting perft results from a UCI engine.
+///
+/// Sends the engine a `position` command containing the FEN and any moves to replay,
+/// then runs `go perft` at the requested depth. Then parses the engine's
+/// output into per move node counts and a total node count.
+///
+/// ### Note: Engine compatibility
+///
+/// The engine must support the UCI commands `position fen [FEN] moves [MOVES]`
+/// and `go perft [DEPTH]`. Its perft output must include one line per move
+/// in the form `[move]: [node count]`, followed by a total node count line
+/// in the form `Nodes searched: [total node count]`.
 impl PerftProvider for UCIEngine {
     fn perft(
         &mut self,
@@ -22,10 +33,10 @@ impl PerftProvider for UCIEngine {
 
         if !position_uci_moves.is_empty() {
             position_command.push_str(" moves");
-            for mv in position_uci_moves {
-                let mv = *mv;
+            for uci_move in position_uci_moves {
+                let uci_move = *uci_move;
                 position_command.push(' ');
-                position_command.push_str(&mv.to_string());
+                position_command.push_str(&uci_move.to_string());
             }
         }
 
@@ -39,9 +50,7 @@ impl PerftProvider for UCIEngine {
         let mut result = PerMovePerftResult::default();
 
         for line in self.iter_rx() {
-            let is_complete = parse_engine_result_line(&mut result, &line).with_context(|| {
-                format!("Error while parsing a line from the engine: \"{line}\"")
-            })?;
+            let is_complete = parse_engine_result_line(&mut result, &line)?;
 
             if is_complete {
                 break;
@@ -55,7 +64,10 @@ impl PerftProvider for UCIEngine {
 /// Parses a line from the engine and pushes any perft results found.
 ///
 /// Returns true when the total nodes searched result has been parsed.
-fn parse_engine_result_line(result: &mut PerMovePerftResult, line: &str) -> Result<bool> {
+fn parse_engine_result_line(
+    result: &mut PerMovePerftResult,
+    line: &str,
+) -> Result<bool, PerftError> {
     let line = line.trim();
     if line.is_empty() {
         return Ok(false);
@@ -67,15 +79,19 @@ fn parse_engine_result_line(result: &mut PerMovePerftResult, line: &str) -> Resu
 
     if string_is_uci_move(prefix) {
         // This is a move result
-        let nodes = nodes_str.parse::<usize>().context("Nodes not parsable")?;
+        let nodes = nodes_str
+            .parse::<usize>()
+            .map_err(|_| "Nodes not parsable")?;
 
         result.moves.push(SingleMovePerftResult {
-            mv: UCIMove::from_str_unwrap(prefix),
+            uci_move: UCIMove::from_str(prefix)?,
             nodes,
         });
     } else if prefix == "Nodes searched" {
         // This is the total result
-        let nodes = nodes_str.parse::<usize>().context("Nodes not parsable")?;
+        let nodes = nodes_str
+            .parse::<usize>()
+            .map_err(|_| "Nodes not parsable")?;
         result.total_nodes = nodes;
 
         return Ok(true);

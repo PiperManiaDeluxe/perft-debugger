@@ -13,9 +13,7 @@ pub struct PerMovePerftResult {
 #[derive(Debug)]
 pub struct SingleMovePerftResult {
     /// Move for this result.
-    ///
-    /// TODO: Rename all instances of `mv` to `uci_move`
-    pub mv: UCIMove,
+    pub uci_move: UCIMove,
     /// Total nodes reached after this move.
     pub nodes: usize,
 }

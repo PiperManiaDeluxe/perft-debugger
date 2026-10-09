@@ -6,7 +6,7 @@ use crate::types::uci_move::UCIMove;
 #[derive(Debug, Clone, Copy)]
 pub struct FailedMove {
     /// The move that failed.
-    pub mv: UCIMove,
+    pub uci_move: UCIMove,
     /// Node count we expected to find.
     pub expected_nodes: usize,
     /// Node count we actual found.
@@ -29,16 +29,22 @@ impl FailedMove {
     pub fn report_fail_reason(&self) {
         match self.get_fail_reason() {
             MoveFailReason::Illegal => {
-                println!("Engine generated an illegal move: {}", self.mv.to_string());
+                println!(
+                    "Engine generated an illegal move: {}",
+                    self.uci_move.to_string()
+                );
             }
             MoveFailReason::Missing => {
                 println!(
                     "Engine did not generate an expected legal move: {}",
-                    self.mv.to_string()
+                    self.uci_move.to_string()
                 );
             }
             MoveFailReason::MisMatched => {
-                println!("Move has a perft count mismatch: {}", self.mv.to_string());
+                println!(
+                    "Move has a perft count mismatch: {}",
+                    self.uci_move.to_string()
+                );
             }
         }
     }
