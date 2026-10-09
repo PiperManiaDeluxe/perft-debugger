@@ -1,3 +1,10 @@
+//! Searches a perft discrepancy down the move tree for missing or illegal
+//! moves at the leaves.
+//!
+//! The search follows non terminal node count mismatches deeper into the tree,
+//! until it finds an unreported missing or illegal move at a leaf, or it
+//! exhausts the search depth.
+
 use anyhow::Result;
 
 use crate::{
@@ -15,8 +22,8 @@ use crate::{
 ///
 /// # Arguments
 ///
-/// * `target_perft`: The [`PerftTarget`] we want to diagnose.
-/// * `true_perft`: The [`PerftTarget`] to use for ground truth results.
+/// * `target_perft`: The [`PerftProvider`] we want to diagnose.
+/// * `true_perft`: The [`PerftProvider`] to use for ground truth results.
 /// * `start_position`: Starting position (in FEN) for the engine perft query.
 /// * `depth`: Remaining perft depth to explore.
 /// * `path`: Moves played from `start_position` to reach the current testing position.
@@ -27,6 +34,7 @@ use crate::{
 ///
 /// * `Ok(Some(report))` if an unreported failing move path is found.
 /// * `Ok(None)` if no unreported failure is found within the search depth.
+///
 pub fn find_failing_leaf(
     target_perft: &mut impl PerftProvider,
     true_perft: &mut impl PerftProvider,

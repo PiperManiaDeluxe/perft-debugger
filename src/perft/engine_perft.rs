@@ -1,3 +1,9 @@
+//! Implements [`PerftProvider`] for a running UCI engine.
+//!
+//! Sends the engine position and perft commands, then parses its output into
+//! per move and total node counts. The engine must support the commands and
+//! output format described in the implementation documentation.
+
 use std::str::FromStr;
 
 use crate::{

@@ -1,3 +1,6 @@
+//! Types representing perft node counts for each move from a position
+//! and the total node count for the search.
+
 use crate::types::uci_move::UCIMove;
 
 /// Per-move perft results for a given root position.

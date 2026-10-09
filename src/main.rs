@@ -1,3 +1,5 @@
+//! Command line tool for finding move generation bugs in UCI chess engines.
+
 use anyhow::{Context, Result, anyhow};
 use clap::Parser;
 
@@ -6,14 +8,14 @@ use crate::{
     main_search::do_main_search, perft::cozy_perft::CozyChessPerftTarget,
 };
 
-pub mod bin_helpers;
-pub mod cli;
-pub mod engine_communication;
-pub mod fail_search;
-pub mod initial_test;
-pub mod main_search;
-pub mod perft;
-pub mod types;
+mod bin_helpers;
+mod cli;
+mod engine_communication;
+mod fail_search;
+mod initial_test;
+mod main_search;
+mod perft;
+mod types;
 
 fn main() -> Result<()> {
     let args = CLIArgs::parse();

@@ -1,3 +1,5 @@
+//! Provides reference perft results using the `cozy_chess` crate.
+
 use anyhow::Context;
 use cozy_chess::Board;
 

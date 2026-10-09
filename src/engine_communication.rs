@@ -1,3 +1,10 @@
+//! Starts and communicates with a chess-engine subprocess.
+//!
+//! [`UCIEngine`] sends commands to the engine's standard input and forwards
+//! lines from its standard output through an iterator. It provides the
+//! process-level communication used by the UCI perft provider. It does not
+//! itself implement the perft result parsing.
+
 use std::{
     io::{BufRead, BufReader, Write},
     process::{Child, ChildStdin, Command, Stdio},

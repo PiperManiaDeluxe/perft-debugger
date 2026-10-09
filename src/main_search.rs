@@ -1,3 +1,10 @@
+//! Searches for and prints failing leaf moves found after an initial perft
+//! discrepancy.
+//!
+//! The search repeats up to the configured limit, tracking reported move
+//! paths so that it can look for additional failures without reporting the
+//! same path again.
+
 use anyhow::Result;
 
 use crate::{

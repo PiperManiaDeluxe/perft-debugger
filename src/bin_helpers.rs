@@ -1,3 +1,5 @@
+//! Helper functions for the binary half of this crate.
+
 use std::{ops::RangeInclusive, str::FromStr};
 
 use anyhow::{Context, Result};

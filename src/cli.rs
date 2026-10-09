@@ -1,3 +1,5 @@
+//! Provides the [`CLIArgs`] struct.
+
 use clap::Parser;
 
 // TODO: Include "infinite mode" setting

@@ -1,3 +1,9 @@
+//! Types describing moves that differ between expected
+//! and reported perft results.
+//!
+//! Includes the move's expected and reported node counts, its failure reason,
+//! and reports identifying a failing move at the end of a move path.
+
 use std::fmt;
 
 use crate::types::uci_move::UCIMove;

@@ -1,3 +1,8 @@
+//! Compares expected and reported per move perft results.
+//!
+//! Identifies moves that are missing, illegal, or have mismatched node counts.
+//! Selected moves can be excluded from the comparison.
+
 use std::collections::HashMap;
 
 use crate::types::{

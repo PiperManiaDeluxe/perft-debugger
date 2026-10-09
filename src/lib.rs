@@ -1,14 +1,21 @@
+//! Library for diagnosing move-generation bugs in chess engines.
+//!
+//! Implement [`PerftProvider`] for an engine or other source of perft results,
+//! then call [`debug_perft_provider`] to compare its results with results from
+//! the `cozy_chess` crate. The output reports whether the tested depths
+//! passed and, when possible, identifies a missing or illegal move.
+
 #![allow(dead_code)]
 
-// TODO: Use the same publicity and API as main.rs
-
-mod bin_helpers;
-mod engine_communication;
-mod fail_search;
-mod initial_test;
-mod lib_ext;
-mod perft;
-mod types;
+pub(crate) mod bin_helpers;
+pub(crate) mod cli;
+pub(crate) mod engine_communication;
+pub(crate) mod fail_search;
+pub(crate) mod initial_test;
+pub(crate) mod lib_ext;
+pub(crate) mod main_search;
+pub(crate) mod perft;
+pub(crate) mod types;
 
 pub use lib_ext::debug_result::DebugResult;
 pub use lib_ext::debugging::debug_perft_provider;
