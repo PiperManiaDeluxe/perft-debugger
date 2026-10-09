@@ -2,7 +2,7 @@
 
 use std::fmt;
 
-use crate::fail_search::FailingLeafReport;
+use crate::FailingLeafReport;
 
 /// Outcome of checking a perft provider against reference results.
 #[derive(Clone)]

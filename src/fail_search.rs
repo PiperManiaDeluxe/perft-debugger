@@ -3,21 +3,10 @@ use anyhow::Result;
 use crate::{
     perft::{compare_results::compare_perft_results, perft_provider::PerftProvider},
     types::{
-        failed_move::{FailedMove, MoveFailReason},
+        failed_move::{FailedMove, FailingLeafReport, MoveFailReason},
         uci_move::UCIMove,
     },
 };
-
-/// Details about a failing move found as a perft leaf.
-///
-/// TODO: Move to types
-#[derive(Debug, Clone)]
-pub struct FailingLeafReport {
-    /// Moves played from the starting position to reach the offending move.
-    pub path: Vec<UCIMove>,
-    /// The move that failed.
-    pub offending_move: FailedMove,
-}
 
 /// Traces a perft failure from the root position to a failing leaf node.
 ///

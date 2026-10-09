@@ -68,3 +68,12 @@ impl fmt::Display for MoveFailReason {
         f.write_str(string)
     }
 }
+
+/// Details about a failing move found as a perft leaf.
+#[derive(Debug, Clone)]
+pub struct FailingLeafReport {
+    /// Moves played from the starting position to reach the offending move.
+    pub path: Vec<UCIMove>,
+    /// The move that failed.
+    pub offending_move: FailedMove,
+}
