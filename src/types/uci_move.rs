@@ -6,15 +6,29 @@ use cozy_chess::{Board, Move, Piece};
 
 use crate::bin_helpers::remap_castling_move;
 
-/// TODO: Docs
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+/// A chess move as it's described by
+/// [Universal Chess Interface](https://en.wikipedia.org/wiki/Universal_Chess_Interface)
+/// specification.
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct UCIMove {
+    /// The moved piece's starting square as an index.
+    ///
+    /// Indexed as: \
+    /// `a1` = 0 \
+    /// `h8` = 63
     pub from: usize,
+    /// The moved piece's end square as an index.
+    ///
+    /// Indexed as: \
+    /// `a1` = 0 \
+    /// `h8` = 63
     pub to: usize,
+    /// The type of piece this move promoted to, if it exists.
     pub promotion: Option<PromotionPiece>,
 }
 
 impl UCIMove {
+    // TODO: Replace with an actual from str impl
     pub fn from_str_unwrap(s: &str) -> Self {
         let squares = [&s[0..=1], &s[2..=3]];
         let [from, to] = squares.map(square_from_name);
@@ -35,7 +49,8 @@ impl UCIMove {
         }
     }
 
-    pub fn from_cozy(board: &Board, cozy_mv: &Move) -> Self {
+    /// TODO: Docs
+    pub(crate) fn from_cozy(board: &Board, cozy_mv: &Move) -> Self {
         let cozy_mv = remap_castling_move(board, cozy_mv);
 
         UCIMove {
@@ -66,7 +81,17 @@ impl fmt::Display for UCIMove {
     }
 }
 
-/// TODO: Docs
+impl fmt::Debug for UCIMove {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("UCIMove")
+            .field("from", &square_to_name(self.from))
+            .field("to", &square_to_name(self.to))
+            .field("promotion", &self.promotion)
+            .finish()
+    }
+}
+
+/// A chess piece type a pawn can promote to.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PromotionPiece {
     Knight,
@@ -76,6 +101,9 @@ pub enum PromotionPiece {
 }
 
 impl PromotionPiece {
+    /// Returns the character representing this promotion, as defined by
+    /// [Universal Chess Interface](https://en.wikipedia.org/wiki/Universal_Chess_Interface)
+    /// specification.
     pub const fn char(&self) -> char {
         match *self {
             PromotionPiece::Knight => 'n',
@@ -86,7 +114,8 @@ impl PromotionPiece {
     }
 }
 
-const SQUARE_NAMES: [&str; 64] = [
+/// TODO: Docs
+pub const SQUARE_NAMES: [&str; 64] = [
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", //
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", //
     "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3", //

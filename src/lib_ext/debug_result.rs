@@ -1,3 +1,5 @@
+//! Provides the [`DebugResult`] enum.
+
 use std::fmt;
 
 use crate::fail_search::FailingLeafReport;

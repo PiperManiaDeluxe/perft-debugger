@@ -1,7 +1,7 @@
 use std::sync::LazyLock;
 
 use perft_debugger::{
-    PerMovePerftResult, PerftError, SingleMovePerftResult, UCIMove, debug_perft_target,
+    PerMovePerftResult, PerftError, SingleMovePerftResult, UCIMove, debug_perft_provider,
 };
 
 const START_POS_FEN: &str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -47,7 +47,7 @@ fn only_plays_e2e4(
 }
 
 fn main() -> Result<(), PerftError> {
-    let result = debug_perft_target(
+    let result = debug_perft_provider(
         // PerftProvider to debug.
         &mut only_plays_e2e4,
         // Position (in FEN) to start perft tests from.

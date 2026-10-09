@@ -8,7 +8,7 @@ use crate::{
     },
 };
 
-/// Details about a failing move that was found while searching for a leaf perft failure.
+/// Details about a failing move found as a perft leaf.
 ///
 /// TODO: Move to types
 #[derive(Debug, Clone)]
