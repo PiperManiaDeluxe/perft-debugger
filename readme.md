@@ -1,5 +1,6 @@
 # perft-debugger
-A command-line tool for finding move-generation bugs in UCI chess engines. \
+
+A command line tool for finding move generation bugs in UCI chess engines. \
 `perft-debugger` runs perft tests with your engine, and searches for variations
 your engine generates illegal moves in. \
 [cozy-chess](https://github.com/analog-hors/cozy-chess/) is used
@@ -76,8 +77,12 @@ perft-debugger will be looking for the following strings:
 - `[move]: [node count]`
 - `Nodes searched: [total node count]`
 
-If your engine is not compatible you can also hook your move generation
-into the function `get_debug_perft_results` in `src/main.rs`.
+### Incompatible engines
+
+If your engine is not compatible you can also use `perft-debugger` as a library,
+to interface directly with your engine.
+
+See [library_use_example.md](./library_use_example.md) for more.
 
 ## Building
 
