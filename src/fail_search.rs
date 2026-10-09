@@ -4,7 +4,7 @@ use cozy_chess::{Board, Move};
 use crate::{
     helpers::uci_from_cozy,
     perft::{compare_results::compare_perft_results, perft_target::PerftTarget},
-    result_types::{FailedMove, MoveFailReason},
+    types::failed_move::{FailedMove, MoveFailReason},
 };
 
 /// A failing move that was found while searching for a perft failure.

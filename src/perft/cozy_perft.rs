@@ -4,7 +4,7 @@ use cozy_chess::Board;
 use crate::{
     helpers::{parse_board, parse_move, remap_castling_move},
     perft::perft_target::{self, PerftTarget},
-    result_types::{PerMovePerftResult, SingleMovePerftResult},
+    types::per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
 };
 
 /// [`PerftTarget`] for the ground truth move generator [`cozy_chess`].

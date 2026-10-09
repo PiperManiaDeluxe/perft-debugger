@@ -13,7 +13,7 @@ pub mod helpers;
 pub mod initial_test;
 pub mod main_search;
 pub mod perft;
-pub mod result_types;
+pub mod types;
 
 fn main() -> Result<()> {
     let args = CLIArgs::parse();

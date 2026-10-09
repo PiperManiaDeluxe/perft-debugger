@@ -1,6 +1,6 @@
 //! Items related to making a move generator accessible to `perft-debugger`.
 
-use crate::result_types::PerMovePerftResult;
+use crate::types::per_move_perft_result::PerMovePerftResult;
 
 /// TODO: Docs
 pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;

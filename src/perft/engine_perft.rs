@@ -4,7 +4,7 @@ use crate::{
     engine_communication::UCIEngine,
     helpers::{parse_move, string_is_uci_move},
     perft::perft_target::{Error, PerftTarget},
-    result_types::{PerMovePerftResult, SingleMovePerftResult},
+    types::per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
 };
 
 /// TODO: Docs?

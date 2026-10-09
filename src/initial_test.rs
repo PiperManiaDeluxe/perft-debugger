@@ -4,8 +4,16 @@ use anyhow::Result;
 
 use crate::{
     perft::{compare_results::compare_perft_results, perft_target::PerftTarget},
-    result_types::FailedMove,
+    types::failed_move::FailedMove,
 };
+
+/// Details the first perft test failure found by [`initial_perft_test`].
+pub struct InitialTestFailReport {
+    /// The first depth at which the engine's perft results differ from the expected results.
+    pub depth: usize,
+    /// Moves whose perft results differ from the expected results.
+    pub failing_moves: Vec<FailedMove>,
+}
 
 /// Iteratively runs deeper perft tests until `max_depth` is reached, or a failing perft depth is hit.
 ///
@@ -50,12 +58,4 @@ pub fn initial_perft_test(
     }
 
     Ok(None)
-}
-
-/// Details the first perft test failure found by [`initial_perft_test`].
-pub struct InitialTestFailReport {
-    /// The first depth at which the engine's perft results differ from the expected results.
-    pub depth: usize,
-    /// Moves whose perft results differ from the expected results.
-    pub failing_moves: Vec<FailedMove>,
 }
