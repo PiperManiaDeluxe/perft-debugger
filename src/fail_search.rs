@@ -1,15 +1,17 @@
 use anyhow::Result;
-use cozy_chess::Board;
 
 use crate::{
-    perft::{compare_results::compare_perft_results, perft_target::PerftTarget},
+    perft::{compare_results::compare_perft_results, perft_provider::PerftProvider},
     types::{
         failed_move::{FailedMove, MoveFailReason},
         uci_move::UCIMove,
     },
 };
 
-/// A failing move that was found while searching for a perft failure.
+/// Details about a failing move that was found while searching for a leaf perft failure.
+///
+/// TODO: Move to types
+#[derive(Debug, Clone)]
 pub struct FailingLeafReport {
     /// Moves played from the starting position to reach the offending move.
     pub path: Vec<UCIMove>,
@@ -37,10 +39,9 @@ pub struct FailingLeafReport {
 /// * `Ok(Some(report))` if an unreported failing move path is found.
 /// * `Ok(None)` if no unreported failure is found within the search depth.
 pub fn find_failing_leaf(
-    target_perft: &mut impl PerftTarget,
-    true_perft: &mut impl PerftTarget,
+    target_perft: &mut impl PerftProvider,
+    true_perft: &mut impl PerftProvider,
     start_position_fen: &str,
-    start_position_board: &Board,
     depth: usize,
     path: Vec<UCIMove>,
     failing_moves: &[FailedMove],
@@ -90,13 +91,12 @@ pub fn find_failing_leaf(
             .perft(start_position_fen, &leaf_path, depth - 1)
             .unwrap();
 
-        let leaf_failing_moves = compare_perft_results(expected, reported);
+        let leaf_failing_moves = compare_perft_results(expected, reported, &[]);
 
         let result = find_failing_leaf(
             target_perft,
             true_perft,
             start_position_fen,
-            start_position_board,
             depth - 1,
             leaf_path,
             &leaf_failing_moves,

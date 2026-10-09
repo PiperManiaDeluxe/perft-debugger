@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::types::uci_move::UCIMove;
 
 /// A move that failed a perft test.
@@ -30,7 +32,10 @@ impl FailedMove {
                 println!("Engine generated an illegal move: {}", self.mv.to_string());
             }
             MoveFailReason::Missing => {
-                println!("Engine missed a legal move: {}", self.mv.to_string());
+                println!(
+                    "Engine did not generate an expected legal move: {}",
+                    self.mv.to_string()
+                );
             }
             MoveFailReason::MisMatched => {
                 println!("Move has a perft count mismatch: {}", self.mv.to_string());
@@ -45,4 +50,15 @@ pub enum MoveFailReason {
     MisMatched,
     Missing,
     Illegal,
+}
+
+impl fmt::Display for MoveFailReason {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string = match *self {
+            Self::MisMatched => "Non-terminal move has a perft node-count mismatch",
+            Self::Missing => "Expected legal move not generated",
+            Self::Illegal => "Illegal move was generated",
+        };
+        f.write_str(string)
+    }
 }

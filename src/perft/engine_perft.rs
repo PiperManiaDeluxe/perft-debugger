@@ -1,9 +1,9 @@
 use anyhow::{Context, Result};
 
 use crate::{
+    bin_helpers::string_is_uci_move,
     engine_communication::UCIEngine,
-    helpers::string_is_uci_move,
-    perft::perft_target::{Error, PerftTarget},
+    perft::perft_provider::{PerftError, PerftProvider},
     types::{
         per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
         uci_move::UCIMove,
@@ -11,13 +11,13 @@ use crate::{
 };
 
 /// TODO: Docs?
-impl PerftTarget for UCIEngine {
+impl PerftProvider for UCIEngine {
     fn perft(
         &mut self,
         position_fen: &str,
         position_uci_moves: &[UCIMove],
         depth: usize,
-    ) -> Result<PerMovePerftResult, Error> {
+    ) -> Result<PerMovePerftResult, PerftError> {
         let mut position_command = format!("position fen {position_fen}");
 
         if !position_uci_moves.is_empty() {

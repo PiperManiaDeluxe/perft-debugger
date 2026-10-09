@@ -3,8 +3,8 @@ use std::time::Instant;
 use anyhow::Result;
 
 use crate::{
-    perft::{compare_results::compare_perft_results, perft_target::PerftTarget},
-    types::failed_move::FailedMove,
+    perft::{compare_results::compare_perft_results, perft_provider::PerftProvider},
+    types::{failed_move::FailedMove, uci_move::UCIMove},
 };
 
 /// Details the first perft test failure found by [`initial_perft_test`].
@@ -29,10 +29,12 @@ pub struct InitialTestFailReport {
 /// failing depth, and the moves whose perft results differ from ground truth.
 /// * `Ok(None)` If all tested depths passed.
 pub fn initial_perft_test(
-    target_perft: &mut impl PerftTarget,
-    true_perft: &mut impl PerftTarget,
+    target_perft: &mut impl PerftProvider,
+    true_perft: &mut impl PerftProvider,
     position_fen: &str,
     max_depth: usize,
+    print: bool,
+    ignored_initial_moves: &[UCIMove],
 ) -> Result<Option<InitialTestFailReport>> {
     for depth in 1..=max_depth {
         let start = Instant::now();
@@ -40,14 +42,24 @@ pub fn initial_perft_test(
         let expected = true_perft.perft(position_fen, &[], depth).unwrap();
         let reported = target_perft.perft(position_fen, &[], depth).unwrap();
 
-        println!(
-            "Perft {} took {:.1} seconds. Nodes: {}",
-            depth,
-            start.elapsed().as_secs_f32(),
-            expected.total_nodes
-        );
+        if print {
+            println!(
+                "Perft {} took {:.1} seconds. Nodes: {}",
+                depth,
+                start.elapsed().as_secs_f32(),
+                expected.total_nodes
+            );
+        }
 
-        let failing_moves = compare_perft_results(expected, reported);
+        let failing_moves = compare_perft_results(
+            expected,
+            reported,
+            if depth == 1 {
+                ignored_initial_moves
+            } else {
+                &[]
+            },
+        );
 
         if !failing_moves.is_empty() {
             return Ok(Some(InitialTestFailReport {

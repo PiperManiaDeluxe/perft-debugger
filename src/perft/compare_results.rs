@@ -15,6 +15,7 @@ use crate::types::{
 pub fn compare_perft_results(
     expected: PerMovePerftResult,
     reported: PerMovePerftResult,
+    ignored_moves: &[UCIMove],
 ) -> Vec<FailedMove> {
     let mut failing_moves = vec![];
 
@@ -25,7 +26,8 @@ pub fn compare_perft_results(
     let mut expected_move_table: HashMap<UCIMove, usize> = HashMap::from_iter(expected_key_pairs);
 
     for reported_result in reported.moves {
-        if let Some(failed_move) = compare_single_result(&mut expected_move_table, reported_result)
+        if let Some(failed_move) =
+            compare_single_result(&mut expected_move_table, reported_result, ignored_moves)
         {
             failing_moves.push(failed_move);
         }
@@ -33,6 +35,10 @@ pub fn compare_perft_results(
 
     // Any moves remaining in expected_move_table is a missing move
     for (mv, nodes) in expected_move_table {
+        if ignored_moves.contains(&mv) {
+            continue;
+        }
+
         failing_moves.push(FailedMove {
             mv,
             expected_nodes: nodes,
@@ -47,7 +53,12 @@ pub fn compare_perft_results(
 fn compare_single_result(
     expected_move_table: &mut HashMap<UCIMove, usize>,
     reported_result: SingleMovePerftResult,
+    ignored_moves: &[UCIMove],
 ) -> Option<FailedMove> {
+    if ignored_moves.contains(&reported_result.mv) {
+        return None;
+    }
+
     match expected_move_table.remove(&reported_result.mv) {
         Some(expected_nodes) if expected_nodes == reported_result.nodes => {
             // Legal move!

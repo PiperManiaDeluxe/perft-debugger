@@ -1,9 +1,12 @@
 // TODO: Docs
 
+use std::fmt::{self, Write};
+
 use cozy_chess::{Board, Move, Piece};
 
-use crate::helpers::remap_castling_move;
+use crate::bin_helpers::remap_castling_move;
 
+/// TODO: Docs
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct UCIMove {
     pub from: usize,
@@ -50,18 +53,20 @@ impl UCIMove {
     }
 }
 
-impl ToString for UCIMove {
-    fn to_string(&self) -> String {
-        let mut result = format!("{}{}", square_to_name(self.from), square_to_name(self.to));
+impl fmt::Display for UCIMove {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(square_to_name(self.from))?;
+        f.write_str(square_to_name(self.to))?;
 
         if let Some(promotion) = self.promotion {
-            result.push(promotion.char());
+            f.write_char(promotion.char())?;
         }
 
-        result
+        Ok(())
     }
 }
 
+/// TODO: Docs
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PromotionPiece {
     Knight,
@@ -92,10 +97,12 @@ const SQUARE_NAMES: [&str; 64] = [
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", //
 ];
 
+/// TODO: Docs
 pub const fn square_to_name(square: usize) -> &'static str {
     SQUARE_NAMES[square]
 }
 
+/// TODO: Docs
 pub const fn square_from_name(name: &str) -> usize {
     let bytes = name.as_bytes();
     assert!(bytes.len() == 2, "Square name must be 2 characters!");

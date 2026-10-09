@@ -3,10 +3,10 @@
 use crate::types::{per_move_perft_result::PerMovePerftResult, uci_move::UCIMove};
 
 /// TODO: Docs
-pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
+pub type PerftError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// TODO: Docs
-pub trait PerftTarget {
+pub trait PerftProvider {
     /// Runs and returns per-move perft results for a [`PerftTarget`].
     ///
     /// Note: This function splits `position_fen` and `position_uci_moves`
@@ -22,20 +22,20 @@ pub trait PerftTarget {
         position_fen: &str,
         position_uci_moves: &[UCIMove],
         depth: usize,
-    ) -> Result<PerMovePerftResult, Error>;
+    ) -> Result<PerMovePerftResult, PerftError>;
 }
 
 /// TODO: Docs?
-impl<F> PerftTarget for F
+impl<F> PerftProvider for F
 where
-    F: FnMut(&str, &[UCIMove], usize) -> Result<PerMovePerftResult, Error>,
+    F: FnMut(&str, &[UCIMove], usize) -> Result<PerMovePerftResult, PerftError>,
 {
     fn perft(
         &mut self,
         position_fen: &str,
         position_uci_moves: &[UCIMove],
         depth: usize,
-    ) -> Result<PerMovePerftResult, Error> {
+    ) -> Result<PerMovePerftResult, PerftError> {
         self(position_fen, position_uci_moves, depth)
     }
 }

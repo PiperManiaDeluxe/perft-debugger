@@ -2,8 +2,8 @@ use anyhow::Context;
 use cozy_chess::Board;
 
 use crate::{
-    helpers::{parse_board, parse_move},
-    perft::perft_target::{self, PerftTarget},
+    bin_helpers::{parse_board, parse_move},
+    perft::perft_provider::{self, PerftProvider},
     types::{
         per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
         uci_move::UCIMove,
@@ -13,13 +13,13 @@ use crate::{
 /// [`PerftTarget`] for the ground truth move generator [`cozy_chess`].
 pub struct CozyChessPerftTarget;
 
-impl PerftTarget for CozyChessPerftTarget {
+impl PerftProvider for CozyChessPerftTarget {
     fn perft(
         &mut self,
         position_fen: &str,
         position_moves: &[UCIMove],
         depth: usize,
-    ) -> Result<PerMovePerftResult, perft_target::Error> {
+    ) -> Result<PerMovePerftResult, perft_provider::PerftError> {
         let mut board = parse_board(position_fen)
             .context("Failed to parse `position_fen` as cozy_chess::Board")?;
 

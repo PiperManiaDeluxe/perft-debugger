@@ -7,3 +7,6 @@ edition = "2024"
 anyhow = "1.0.104"
 clap = { version = "4.6.7", features = ["derive"] }
 cozy-chess = "0.3.4"
+
+[dev-dependencies]
+rand = "0.10.3"

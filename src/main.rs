@@ -6,10 +6,10 @@ use crate::{
     main_search::do_main_search, perft::cozy_perft::CozyChessPerftTarget,
 };
 
+pub mod bin_helpers;
 pub mod cli;
 pub mod engine_communication;
 pub mod fail_search;
-pub mod helpers;
 pub mod initial_test;
 pub mod main_search;
 pub mod perft;
@@ -55,9 +55,15 @@ fn run(engine: &mut UCIEngine, args: CLIArgs) -> Result<()> {
     let mut true_perft = CozyChessPerftTarget;
 
     // Find the first depth we fail a perft test at, if at all
-    let initial_result =
-        initial_perft_test(engine, &mut true_perft, &args.position_fen, args.max_depth)
-            .context("Failed to run initial perft test")?;
+    let initial_result = initial_perft_test(
+        engine,
+        &mut true_perft,
+        &args.position_fen,
+        args.max_depth,
+        false,
+        &[],
+    )
+    .context("Failed to run initial perft test")?;
 
     match initial_result {
         Some(initial_fail) => {
