@@ -5,7 +5,7 @@
 //! until it finds an unreported missing or illegal move at a leaf, or it
 //! exhausts the search depth.
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 
 use crate::{
     perft::{compare_results::compare_perft_results, perft_provider::PerftProvider},
@@ -24,7 +24,8 @@ use crate::{
 ///
 /// * `target_perft`: The [`PerftProvider`] we want to diagnose.
 /// * `true_perft`: The [`PerftProvider`] to use for ground truth results.
-/// * `start_position`: Starting position (in FEN) for the engine perft query.
+/// * `start_position_fen`: FEN string for the position from which the search
+///                         path is replayed.
 /// * `depth`: Remaining perft depth to explore.
 /// * `path`: Moves played from `start_position` to reach the current testing position.
 /// * `failing_moves`: Per-move perft discrepancies found at the current testing position.
@@ -35,6 +36,11 @@ use crate::{
 /// * `Ok(Some(report))` if an unreported failing move path is found.
 /// * `Ok(None)` if no unreported failure is found within the search depth.
 ///
+/// # Errors
+///
+/// Returns an error if either provider fails to produce perft results while
+/// the search explores a deeper position. The error includes context
+/// identifying whether `true_perft` or `target_perft` failed.
 pub fn find_failing_leaf(
     target_perft: &mut impl PerftProvider,
     true_perft: &mut impl PerftProvider,
@@ -82,11 +88,14 @@ pub fn find_failing_leaf(
 
         let expected = true_perft
             .perft(start_position_fen, &leaf_path, depth - 1)
-            .unwrap();
-
+            .map_err(|err| {
+                anyhow!("Error while getting perft results from true_perft provider: {err}")
+            })?;
         let reported = target_perft
             .perft(start_position_fen, &leaf_path, depth - 1)
-            .unwrap();
+            .map_err(|err| {
+                anyhow!("Error while getting perft results from target_perft provider: {err}")
+            })?;
 
         let leaf_failing_moves = compare_perft_results(expected, reported, &[]);
 

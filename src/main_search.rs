@@ -12,17 +12,23 @@ use crate::{
     perft::perft_provider::PerftProvider,
 };
 
-/// Searches for and prints failing leaf moves from an initial perft failure.
+/// Searches an initial perft failure for failing leaf moves and prints any
+/// reports it finds.
 ///
-/// Repeats the search up to `args.max_searches` times,
-/// avoiding paths that were already reported,
-/// and prints a warning if the maximum search count is reached.
+/// Repeats the leaf search up to `args.max_searches` times, avoiding paths
+/// already reported so it can look for additional failures. Prints a warning
+/// when the search limit is reached; additional failing leaves may remain.
 ///
 /// # Arguments
 ///
-/// * `engine`: [`UCIEngine`] process handle to diagnose.
-/// * `args`: Commandline arguments for this run.
-/// * `initial_fail`: The depth and failing moves of the initial perft report.
+/// * `target_perft`: Provider being diagnosed.
+/// * `true_perft`: Provider supplying the reference perft results.
+/// * `args`: CLI settings, including the starting position and search limit.
+/// * `initial_fail`: First failing depth and its per-move discrepancies.
+///
+/// # Returns
+///
+/// Returns `Ok(())` after the search completes and its reports are printed.
 pub fn do_main_search(
     target_perft: &mut impl PerftProvider,
     true_perft: &mut impl PerftProvider,

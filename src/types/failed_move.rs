@@ -15,7 +15,7 @@ pub struct FailedMove {
     pub uci_move: UCIMove,
     /// Node count we expected to find.
     pub expected_nodes: usize,
-    /// Node count we actual found.
+    /// Node count reported by the provider.
     pub reported_nodes: usize,
 }
 
@@ -56,11 +56,16 @@ impl FailedMove {
     }
 }
 
-/// Reasons a move can fail perft
+/// Describes how a move's reported perft result differs from the expected result.
 #[derive(Debug, PartialEq, Eq)]
 pub enum MoveFailReason {
+    /// Both providers reported a nonzero node count, but the counts differ.
     MisMatched,
+    /// The reference provider reported this legal move, but the target provider
+    /// did not generate it.
     Missing,
+    /// The target provider generated a move that the reference provider did not
+    /// report as legal.
     Illegal,
 }
 

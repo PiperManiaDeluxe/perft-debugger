@@ -34,7 +34,7 @@ impl UCIEngine {
     ///
     /// # Arguments
     ///
-    /// * `engine_command`: CLI command to run the engine with.
+    /// * `engine_command`: Engine executable path/name.
     pub fn open_engine(engine_command: &str) -> Result<Self> {
         let mut engine_process = Command::new(engine_command)
             .stdin(Stdio::piped())

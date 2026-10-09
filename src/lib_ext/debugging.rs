@@ -23,12 +23,11 @@ use crate::{
 /// * `perft_provider`: Provider whose results are being checked.
 /// * `test_position_fen`: FEN string for the position to test.
 /// * `max_test_depth`: Greatest perft depth to test. A value of `0` runs no tests.
-/// * `ignored_lines`: Move paths to ignore as described above.
+/// * `ignored_lines`: Move paths to ignore, as described above.
 ///
 /// # Errors
 ///
 /// Returns an error if the diagnostic process or a perft provider returns an error.
-/// TODO: Use thiserror for non perft provider errors.
 pub fn debug_perft_provider(
     perft_provider: &mut impl PerftProvider,
     test_position_fen: &str,

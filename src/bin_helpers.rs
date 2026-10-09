@@ -17,7 +17,7 @@ pub fn parse_board(position_fen: &str) -> Result<Board> {
 
 /// Convenience wrapper function to parse a [`cozy_chess::Move`] from a UCI compatible string.
 ///
-/// Wraps the [`cozy_chess::FenParseError`] in an [`anyhow::Result`]
+/// Wraps the [`cozy_chess::MoveParseError`] in an [`anyhow::Result`]
 /// so we can use [`anyhow`]'s error handling.
 ///
 /// Note: This will fail if we have to use the resulting move on a [`cozy_chess::Board`]. \

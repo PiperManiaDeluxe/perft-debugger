@@ -11,12 +11,20 @@ use crate::types::{
     uci_move::UCIMove,
 };
 
-/// Compares [`PerMovePerftResult`]s and returns all conflicting moves in `reported`.
+/// Compares expected and reported per move perft results.
 ///
-/// # Arguments
+/// Returns a [`FailedMove`] for each non ignored move that is missing from the
+/// reported results, is reported as illegal, or has a different node count.
 ///
-/// * `expected`: Ground truth per-move perft results.
-/// * `reported`: Per-move perft results reported from the engine.
+/// # Parameters
+///
+/// * `expected`: Reference per move perft results.
+/// * `reported`: Per move perft results being checked against the reference.
+/// * `ignored_moves`: Moves to exclude from comparison.
+///
+/// # Returns
+///
+/// The moves with discrepancies and their expected and reported node counts.
 pub fn compare_perft_results(
     expected: PerMovePerftResult,
     reported: PerMovePerftResult,

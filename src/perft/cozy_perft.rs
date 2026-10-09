@@ -12,7 +12,8 @@ use crate::{
     },
 };
 
-/// [`PerftTarget`] for the ground truth move generator [`cozy_chess`].
+/// A [`PerftProvider`] that uses [`cozy_chess`] to generate reference perft
+/// results.
 pub struct CozyChessPerftTarget;
 
 impl PerftProvider for CozyChessPerftTarget {
