@@ -4,7 +4,7 @@ use cozy_chess::Move;
 
 use crate::{
     engine_communication::UCIEngine, initial_test::initial_perft_test, main_search::do_main_search,
-    perft::engine_perft::get_uci_engine_perft_results, results::PerMovePerftResult,
+    perft::engine_perft::get_uci_engine_perft_results, result_types::PerMovePerftResult,
 };
 
 /// Computes the per-move perft results to debug.
@@ -42,7 +42,7 @@ pub mod helpers;
 pub mod initial_test;
 pub mod main_search;
 pub mod perft;
-pub mod results;
+pub mod result_types;
 
 // TODO: Include "infinite mode" setting
 // infinite mode loops over every illegal move until

@@ -5,7 +5,7 @@ use crate::{
     engine_communication::UCIEngine,
     get_debug_perft_results,
     perft::{compare_results::compare_perft_results, true_perft::get_true_perft_results},
-    results::{FailedMove, MoveFailReason},
+    result_types::{FailedMove, MoveFailReason},
 };
 
 /// A failing move that was found while searching for a perft failure.

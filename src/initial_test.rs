@@ -7,7 +7,7 @@ use crate::{
     get_debug_perft_results,
     helpers::parse_board,
     perft::{compare_results::compare_perft_results, true_perft::get_true_perft_results},
-    results::FailedMove,
+    result_types::FailedMove,
 };
 
 /// Iteratively runs deeper perft tests until `max_depth` is reached, or a failing perft depth is hit.

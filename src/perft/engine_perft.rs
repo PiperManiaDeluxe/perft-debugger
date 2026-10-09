@@ -4,7 +4,7 @@ use cozy_chess::Move;
 use crate::{
     engine_communication::UCIEngine,
     helpers::{parse_move, string_is_uci_move},
-    results::{PerMovePerftResult, SingleMovePerftResult},
+    result_types::{PerMovePerftResult, SingleMovePerftResult},
 };
 
 /// Runs and extracts per-move perft results on a [`UCIEngine`] process.

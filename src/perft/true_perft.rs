@@ -2,7 +2,7 @@ use cozy_chess::Board;
 
 use crate::{
     helpers::remap_castling_move,
-    results::{PerMovePerftResult, SingleMovePerftResult},
+    result_types::{PerMovePerftResult, SingleMovePerftResult},
 };
 
 /// Computes ground truth per-move perft results for every legal move on the given board.

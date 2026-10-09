@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use cozy_chess::Move;
 
-use crate::results::{FailedMove, PerMovePerftResult, SingleMovePerftResult};
+use crate::result_types::{FailedMove, PerMovePerftResult, SingleMovePerftResult};
 
 /// Compares [`PerMovePerftResult`]s and returns all conflicting moves in `reported`.
 ///
