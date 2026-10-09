@@ -27,6 +27,12 @@ pub fn parse_move(move_uci: &str) -> Result<Move> {
         .context("Error while parsing move from UCI string")
 }
 
+/// TODO: Docs
+pub fn uci_from_cozy(mv: &Move, board: &Board) -> String {
+    remap_castling_move(board, mv);
+    mv.to_string()
+}
+
 /// Returns a [`cozy_chess::Move`] with castling remapped to proper UCI spec.
 ///
 /// [`cozy_chess`] defines castling as the king moving to the rook's square. \

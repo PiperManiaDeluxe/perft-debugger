@@ -2,9 +2,8 @@ use anyhow::Result;
 use cozy_chess::{Board, Move};
 
 use crate::{
-    engine_communication::UCIEngine,
-    get_debug_perft_results,
-    perft::{compare_results::compare_perft_results, true_perft::get_true_perft_results},
+    helpers::uci_from_cozy,
+    perft::{compare_results::compare_perft_results, perft_target::PerftTarget},
     result_types::{FailedMove, MoveFailReason},
 };
 
@@ -23,12 +22,12 @@ pub struct FailingLeafReport {
 ///
 /// # Arguments
 ///
-/// * `engine`: [`UCIEngine`] process handle to diagnose.
+/// * `target_perft`: The [`PerftTarget`] we want to diagnose.
+/// * `true_perft`: The [`PerftTarget`] to use for ground truth results.
 /// * `start_position`: Starting position (in FEN) for the engine perft query.
-/// * `board`: Current position in the search.
 /// * `depth`: Remaining perft depth to explore.
-/// * `path`: Moves played from `start_position` to reach `board`.
-/// * `failing_moves`: Per-move perft discrepancies found at `board`.
+/// * `path`: Moves played from `start_position` to reach the current testing position.
+/// * `failing_moves`: Per-move perft discrepancies found at the current testing position.
 /// * `reported_lines`: Failure leaf move paths that have already been reported.
 ///
 /// # Returns
@@ -36,9 +35,10 @@ pub struct FailingLeafReport {
 /// * `Ok(Some(report))` if an unreported failing move path is found.
 /// * `Ok(None)` if no unreported failure is found within the search depth.
 pub fn find_failing_leaf(
-    engine: &mut UCIEngine,
-    start_position: &str,
-    board: &Board,
+    target_perft: &mut impl PerftTarget,
+    true_perft: &mut impl PerftTarget,
+    start_position_fen: &str,
+    start_position_board: &Board,
     depth: usize,
     path: Vec<Move>,
     failing_moves: &[FailedMove],
@@ -77,27 +77,30 @@ pub fn find_failing_leaf(
             continue;
         }
 
-        let mut leaf_board = board.clone();
-        leaf_board.play_unchecked(failed_move.mv);
         let mut leaf_path = path.clone();
         leaf_path.push(failed_move.mv);
 
-        let expected = get_true_perft_results(&leaf_board, depth - 1);
-
-        let mut moves_string = String::new();
+        let mut move_path_uci = vec![];
         for mv in &leaf_path {
-            moves_string.push_str(&mv.to_string());
-            moves_string.push(' ');
+            move_path_uci.push(uci_from_cozy(mv, &start_position_board));
         }
+        let move_path_uci_refs: Vec<&str> = move_path_uci.iter().map(String::as_str).collect();
 
-        let reported = get_debug_perft_results(engine, start_position, &leaf_path, depth - 1)?;
+        let expected = true_perft
+            .perft(start_position_fen, &move_path_uci_refs, depth - 1)
+            .unwrap();
+
+        let reported = target_perft
+            .perft(start_position_fen, &move_path_uci_refs, depth - 1)
+            .unwrap();
 
         let leaf_failing_moves = compare_perft_results(expected, reported);
 
         let result = find_failing_leaf(
-            engine,
-            start_position,
-            &leaf_board,
+            target_perft,
+            true_perft,
+            start_position_fen,
+            start_position_board,
             depth - 1,
             leaf_path,
             &leaf_failing_moves,

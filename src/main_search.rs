@@ -1,8 +1,8 @@
 use anyhow::Result;
 
 use crate::{
-    CLIArgs, engine_communication::UCIEngine, fail_search::find_failing_leaf, helpers::parse_board,
-    initial_test::InitialTestFailReport,
+    cli::CLIArgs, fail_search::find_failing_leaf, helpers::parse_board,
+    initial_test::InitialTestFailReport, perft::perft_target::PerftTarget,
 };
 
 /// Searches for and prints failing leaf moves from an initial perft failure.
@@ -17,7 +17,8 @@ use crate::{
 /// * `args`: Commandline arguments for this run.
 /// * `initial_fail`: The depth and failing moves of the initial perft report.
 pub fn do_main_search(
-    engine: &mut UCIEngine,
+    target_perft: &mut impl PerftTarget,
+    true_perft: &mut impl PerftTarget,
     args: &CLIArgs,
     initial_fail: InitialTestFailReport,
 ) -> Result<()> {
@@ -32,7 +33,8 @@ pub fn do_main_search(
         let board = parse_board(&args.position_fen)?;
 
         let fail_leaf_result = find_failing_leaf(
-            engine,
+            target_perft,
+            true_perft,
             &args.position_fen,
             &board,
             initial_fail.depth,

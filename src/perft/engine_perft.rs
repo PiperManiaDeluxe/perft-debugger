@@ -1,58 +1,52 @@
 use anyhow::{Context, Result};
-use cozy_chess::Move;
 
 use crate::{
     engine_communication::UCIEngine,
     helpers::{parse_move, string_is_uci_move},
+    perft::perft_target::{Error, PerftTarget},
     result_types::{PerMovePerftResult, SingleMovePerftResult},
 };
 
-/// Runs and extracts per-move perft results on a [`UCIEngine`] process.
-///
-/// Note: This function splits `start_position` and `moves`
-/// to reveal bugs in an engine's ability to make moves.
-///
-/// # Arguments
-///
-/// * `engine`: [`UCIEngine`] process to run on.
-/// * `start_fen`: Position (in FEN) to initialize the board state in.
-/// * `moves`: Moves to make before starting the perft test.
-/// * `depth`: Total depth to explore.
-pub fn get_uci_engine_perft_results(
-    engine: &mut UCIEngine,
-    start_fen: &str,
-    moves: &[Move],
-    depth: usize,
-) -> Result<PerMovePerftResult> {
-    // Send the position
-    let mut position_command = format!("position fen {start_fen}");
+/// TODO: Docs?
+impl PerftTarget for UCIEngine {
+    fn perft(
+        &mut self,
+        position_fen: &str,
+        position_uci_moves: &[&str],
+        depth: usize,
+    ) -> Result<PerMovePerftResult, Error> {
+        let mut position_command = format!("position fen {position_fen}");
 
-    if !moves.is_empty() {
-        position_command.push_str(" moves");
-        for mv in moves {
-            position_command.push(' ');
-            position_command.push_str(&mv.to_string());
+        if !position_uci_moves.is_empty() {
+            position_command.push_str(" moves");
+            for mv in position_uci_moves {
+                let mv = *mv;
+                position_command.push(' ');
+                position_command.push_str(mv);
+            }
         }
-    }
 
-    engine.send_command(&position_command)?;
+        // Set position
+        self.send_command(&position_command)?;
 
-    // Run perft
-    engine.send_command(&format!("go perft {depth}"))?;
+        // Run perft
+        self.send_command(&format!("go perft {depth}"))?;
 
-    // Parse the outputs
-    let mut result = PerMovePerftResult::default();
+        // Parse the outputs
+        let mut result = PerMovePerftResult::default();
 
-    for line in engine.iter_rx() {
-        let is_complete = parse_engine_result_line(&mut result, &line)
-            .with_context(|| format!("Error while parsing a line from the engine: \"{line}\""))?;
+        for line in self.iter_rx() {
+            let is_complete = parse_engine_result_line(&mut result, &line).with_context(|| {
+                format!("Error while parsing a line from the engine: \"{line}\"")
+            })?;
 
-        if is_complete {
-            break;
+            if is_complete {
+                break;
+            }
         }
-    }
 
-    Ok(result)
+        Ok(result)
+    }
 }
 
 /// Parses a line from the engine and pushes any perft results found.

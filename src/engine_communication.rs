@@ -7,7 +7,7 @@ use std::{
 
 use anyhow::{Context, Result};
 
-/// Chess engine process we can communicate with.
+/// A chess engine process we can communicate with.
 pub struct UCIEngine {
     /// Engine child process.
     process: Child,
