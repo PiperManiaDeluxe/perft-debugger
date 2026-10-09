@@ -2,9 +2,12 @@ use anyhow::{Context, Result};
 
 use crate::{
     engine_communication::UCIEngine,
-    helpers::{parse_move, string_is_uci_move},
+    helpers::string_is_uci_move,
     perft::perft_target::{Error, PerftTarget},
-    types::per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
+    types::{
+        per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
+        uci_move::UCIMove,
+    },
 };
 
 /// TODO: Docs?
@@ -12,7 +15,7 @@ impl PerftTarget for UCIEngine {
     fn perft(
         &mut self,
         position_fen: &str,
-        position_uci_moves: &[&str],
+        position_uci_moves: &[UCIMove],
         depth: usize,
     ) -> Result<PerMovePerftResult, Error> {
         let mut position_command = format!("position fen {position_fen}");
@@ -22,7 +25,7 @@ impl PerftTarget for UCIEngine {
             for mv in position_uci_moves {
                 let mv = *mv;
                 position_command.push(' ');
-                position_command.push_str(mv);
+                position_command.push_str(&mv.to_string());
             }
         }
 
@@ -65,10 +68,9 @@ fn parse_engine_result_line(result: &mut PerMovePerftResult, line: &str) -> Resu
     if string_is_uci_move(prefix) {
         // This is a move result
         let nodes = nodes_str.parse::<usize>().context("Nodes not parsable")?;
-        let result_move = parse_move(prefix)?;
 
         result.moves.push(SingleMovePerftResult {
-            mv: result_move,
+            mv: UCIMove::from_str_unwrap(prefix),
             nodes,
         });
     } else if prefix == "Nodes searched" {

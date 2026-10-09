@@ -1,16 +1,18 @@
 use anyhow::Result;
-use cozy_chess::{Board, Move};
+use cozy_chess::Board;
 
 use crate::{
-    helpers::uci_from_cozy,
     perft::{compare_results::compare_perft_results, perft_target::PerftTarget},
-    types::failed_move::{FailedMove, MoveFailReason},
+    types::{
+        failed_move::{FailedMove, MoveFailReason},
+        uci_move::UCIMove,
+    },
 };
 
 /// A failing move that was found while searching for a perft failure.
 pub struct FailingLeafReport {
     /// Moves played from the starting position to reach the offending move.
-    pub path: Vec<Move>,
+    pub path: Vec<UCIMove>,
     /// The move that failed.
     pub offending_move: FailedMove,
 }
@@ -40,9 +42,9 @@ pub fn find_failing_leaf(
     start_position_fen: &str,
     start_position_board: &Board,
     depth: usize,
-    path: Vec<Move>,
+    path: Vec<UCIMove>,
     failing_moves: &[FailedMove],
-    reported_lines: &[Vec<Move>],
+    reported_lines: &[Vec<UCIMove>],
 ) -> Result<Option<FailingLeafReport>> {
     if failing_moves.is_empty() || depth == 0 {
         return Ok(None);
@@ -80,18 +82,12 @@ pub fn find_failing_leaf(
         let mut leaf_path = path.clone();
         leaf_path.push(failed_move.mv);
 
-        let mut move_path_uci = vec![];
-        for mv in &leaf_path {
-            move_path_uci.push(uci_from_cozy(mv, &start_position_board));
-        }
-        let move_path_uci_refs: Vec<&str> = move_path_uci.iter().map(String::as_str).collect();
-
         let expected = true_perft
-            .perft(start_position_fen, &move_path_uci_refs, depth - 1)
+            .perft(start_position_fen, &leaf_path, depth - 1)
             .unwrap();
 
         let reported = target_perft
-            .perft(start_position_fen, &move_path_uci_refs, depth - 1)
+            .perft(start_position_fen, &leaf_path, depth - 1)
             .unwrap();
 
         let leaf_failing_moves = compare_perft_results(expected, reported);

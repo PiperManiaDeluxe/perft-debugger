@@ -1,4 +1,4 @@
-use cozy_chess::Move;
+use crate::types::uci_move::UCIMove;
 
 /// Per-move perft results for a root position.
 #[derive(Debug, Default)]
@@ -13,7 +13,7 @@ pub struct PerMovePerftResult {
 #[derive(Debug)]
 pub struct SingleMovePerftResult {
     /// Root move for this result.
-    pub mv: Move,
+    pub mv: UCIMove,
     /// Total nodes reached for this move.
     pub nodes: usize,
 }

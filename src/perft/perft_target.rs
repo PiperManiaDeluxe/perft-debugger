@@ -1,6 +1,6 @@
 //! Items related to making a move generator accessible to `perft-debugger`.
 
-use crate::types::per_move_perft_result::PerMovePerftResult;
+use crate::types::{per_move_perft_result::PerMovePerftResult, uci_move::UCIMove};
 
 /// TODO: Docs
 pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -20,7 +20,7 @@ pub trait PerftTarget {
     fn perft(
         &mut self,
         position_fen: &str,
-        position_uci_moves: &[&str],
+        position_uci_moves: &[UCIMove],
         depth: usize,
     ) -> Result<PerMovePerftResult, Error>;
 }
@@ -28,12 +28,12 @@ pub trait PerftTarget {
 /// TODO: Docs?
 impl<F> PerftTarget for F
 where
-    F: FnMut(&str, &[&str], usize) -> Result<PerMovePerftResult, Error>,
+    F: FnMut(&str, &[UCIMove], usize) -> Result<PerMovePerftResult, Error>,
 {
     fn perft(
         &mut self,
         position_fen: &str,
-        position_uci_moves: &[&str],
+        position_uci_moves: &[UCIMove],
         depth: usize,
     ) -> Result<PerMovePerftResult, Error> {
         self(position_fen, position_uci_moves, depth)

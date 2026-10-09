@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use cozy_chess::Move;
-
 use crate::types::{
     failed_move::FailedMove,
     per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
+    uci_move::UCIMove,
 };
 
 /// Compares [`PerMovePerftResult`]s and returns all conflicting moves in `reported`.
@@ -23,7 +22,7 @@ pub fn compare_perft_results(
     let move_result_to_tuple = |result: &SingleMovePerftResult| (result.mv, result.nodes);
 
     let expected_key_pairs = expected.moves.iter().map(move_result_to_tuple);
-    let mut expected_move_table: HashMap<Move, usize> = HashMap::from_iter(expected_key_pairs);
+    let mut expected_move_table: HashMap<UCIMove, usize> = HashMap::from_iter(expected_key_pairs);
 
     for reported_result in reported.moves {
         if let Some(failed_move) = compare_single_result(&mut expected_move_table, reported_result)
@@ -46,7 +45,7 @@ pub fn compare_perft_results(
 
 /// Compares a [`SingleMovePerftResult`] to an expected hashmap of move results, then returns a failed move if found.
 fn compare_single_result(
-    expected_move_table: &mut HashMap<Move, usize>,
+    expected_move_table: &mut HashMap<UCIMove, usize>,
     reported_result: SingleMovePerftResult,
 ) -> Option<FailedMove> {
     match expected_move_table.remove(&reported_result.mv) {

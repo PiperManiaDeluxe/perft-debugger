@@ -1,10 +1,10 @@
-use cozy_chess::Move;
+use crate::types::uci_move::UCIMove;
 
 /// A move that failed a perft test.
 #[derive(Debug, Clone, Copy)]
 pub struct FailedMove {
     /// The move that failed.
-    pub mv: Move,
+    pub mv: UCIMove,
     /// Node count we expected to find.
     pub expected_nodes: usize,
     /// Node count we actual found.
@@ -27,13 +27,13 @@ impl FailedMove {
     pub fn report_fail_reason(&self) {
         match self.get_fail_reason() {
             MoveFailReason::Illegal => {
-                println!("Engine generated an illegal move: {}", self.mv);
+                println!("Engine generated an illegal move: {}", self.mv.to_string());
             }
             MoveFailReason::Missing => {
-                println!("Engine missed a legal move: {}", self.mv);
+                println!("Engine missed a legal move: {}", self.mv.to_string());
             }
             MoveFailReason::MisMatched => {
-                println!("Move has a perft count mismatch: {}", self.mv);
+                println!("Move has a perft count mismatch: {}", self.mv.to_string());
             }
         }
     }

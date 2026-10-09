@@ -2,9 +2,12 @@ use anyhow::Context;
 use cozy_chess::Board;
 
 use crate::{
-    helpers::{parse_board, parse_move, remap_castling_move},
+    helpers::{parse_board, parse_move},
     perft::perft_target::{self, PerftTarget},
-    types::per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
+    types::{
+        per_move_perft_result::{PerMovePerftResult, SingleMovePerftResult},
+        uci_move::UCIMove,
+    },
 };
 
 /// [`PerftTarget`] for the ground truth move generator [`cozy_chess`].
@@ -14,7 +17,7 @@ impl PerftTarget for CozyChessPerftTarget {
     fn perft(
         &mut self,
         position_fen: &str,
-        position_moves: &[&str],
+        position_moves: &[UCIMove],
         depth: usize,
     ) -> Result<PerMovePerftResult, perft_target::Error> {
         let mut board = parse_board(position_fen)
@@ -22,7 +25,7 @@ impl PerftTarget for CozyChessPerftTarget {
 
         // Play the moves to this point
         for mv in position_moves {
-            let mv = parse_move(*mv)
+            let mv = parse_move(&mv.to_string())
                 .context("Failed to parse a move in `position_moves` as cozy_chess::Move")?;
 
             // TODO: We might want the checked variant
@@ -34,9 +37,7 @@ impl PerftTarget for CozyChessPerftTarget {
         board.generate_moves(|legal_moves| {
             for child_move in legal_moves {
                 let mut child_board = board.clone();
-
-                // Cozy chess moves are not UCI compliant.
-                let reported_move = remap_castling_move(&board, &child_move);
+                let reported_move = UCIMove::from_cozy(&child_board, &child_move);
 
                 child_board.play_unchecked(child_move);
 
