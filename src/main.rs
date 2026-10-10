@@ -16,6 +16,7 @@ mod initial_test;
 mod main_search;
 mod perft;
 mod types;
+mod c_ffi;
 
 fn main() -> Result<()> {
     let args = CLIArgs::parse();

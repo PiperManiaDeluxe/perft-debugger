@@ -3,10 +3,20 @@ name = "perft-debugger"
 version = "1.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 anyhow = "1.0.104"
 clap = { version = "4.6.7", features = ["derive"] }
 cozy-chess = "0.3.4"
+# TODO: Use in crate
+libc = "0.2.190"
 
 [dev-dependencies]
 rand = "0.10.3"
+
+[build-dependencies]
+cbindgen = "0.29.4"
+which = "8.0.6"
+anyhow = "1.0.104"

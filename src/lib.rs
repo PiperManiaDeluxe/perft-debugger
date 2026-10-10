@@ -16,6 +16,7 @@ pub(crate) mod lib_ext;
 pub(crate) mod main_search;
 pub(crate) mod perft;
 pub(crate) mod types;
+pub mod c_ffi;
 
 pub use lib_ext::debug_result::DebugResult;
 pub use lib_ext::debugging::debug_perft_provider;
