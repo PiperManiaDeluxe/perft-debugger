@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "${workspaceFolder}/perft_debugger_c_example",
-      "program": "${workspaceFolder}/perft_debugger_c_example/build/Debug/",
+      "program": "${workspaceFolder}/perft_debugger_c_example/build/Debug/perft_debugger_c_example",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

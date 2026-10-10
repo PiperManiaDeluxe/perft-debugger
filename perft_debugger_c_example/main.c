@@ -5,59 +5,71 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int only_plays_e2e4(
+/// TODO_DOCS
+typedef struct {
+    SingleMovePerftResult *move_results;
+} ExampleContext;
+
+/// TODO_DOCS
+static PerftResult only_plays_e2e4(
     void *user_data,
     const char *fen,
-    const FFISlice *moves,
+    const char *const *moves,
     size_t move_count,
     size_t depth,
-    FFIBuffer *output,
-    FFIBuffer *error
+    PerMovePerftResult *output
 ) {
     (void)user_data;
+    (void)fen;
     (void)moves;
+    (void)move_count;
+    (void)depth;
 
-    if (output == NULL || error == NULL) {
-        return 2;
+    ExampleContext *context = user_data;
+
+    size_t move_result_count = 1;
+
+    context->move_results = malloc(move_result_count * sizeof(*context->move_results));
+    if (context->move_results == NULL) {
+        return (PerftResult){
+            .successful = false,
+            .error = "Could not allocate move_results",
+        };
     }
 
-    *output = (FFIBuffer){0};
-    *error = (FFIBuffer){0};
+    context->move_results[0] = (SingleMovePerftResult){
+        .uci_move = "e2e4",
+        .nodes = 1,
+    };
 
-    fprintf(stderr, "C perft callback called for FEN: %s\n", fen);
-    fprintf(stderr, "Depth: %zu; moves to replay: %zu\n", depth, move_count);
+    output->moves = context->move_results;
+    output->move_count = 1;
+    output->total_nodes = 1;
 
-    /* Return a demonstration error message for Rust to handle. */
-    static const char message[] = "Demo: C perft callback was reached";
-
-    error->data = malloc(sizeof(message) - 1);
-    if (error->data == NULL) {
-        return 3;
-    }
-
-    memcpy(error->data, message, sizeof(message) - 1);
-    error->len = sizeof(message) - 1;
-
-    return 1;
-}
-
-static void c_free_buffer(void *user_data, FFIBuffer buffer) {
-    (void)user_data;
-    free(buffer.data);
+    return (PerftResult){.successful = true, .error = ""};
 }
 
 int main() {
-    printf("Hello world!\n");
+    ExampleContext context = {0};
 
     CPerftProvider provider = {
-        .user_data = NULL,
+        .user_data = &context,
         .perft = only_plays_e2e4,
-        .free_buffer = c_free_buffer,
     };
 
-    int status = do_perft_test(&provider);
+    RunResult result = do_perft_test(&provider);
 
-    printf("do_perft_thing returned status %d\n", status);
+    free(context.move_results);
 
+    if (!result.successful) {
+        if (result.error != NULL) {
+            fprintf(stdout, "%s\n", result.error);
+        }
+
+        free_run_result(result);
+        return EXIT_FAILURE;
+    }
+
+    free_run_result(result);
     return EXIT_SUCCESS;
 }

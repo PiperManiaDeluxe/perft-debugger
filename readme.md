@@ -100,3 +100,5 @@ LLMs were not used for a majority of this project with 2 exceptions:
 
 1. Assisting in diagnosing some logic bugs
 2. Helping write documentation
+
+TODO: Explain AI assistance for C FFI 

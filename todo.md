@@ -1,3 +1,5 @@
+- [ ] Replace C FFI with native C port
+
 - [ ] Write a version of `PerftProvider` and reference generators for different types of pseudo legal moves.
     - Base pseudo legal move settings.
         1. [ ] Kings allowed on board (Just remove otherwise).

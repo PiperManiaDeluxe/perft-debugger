@@ -56,6 +56,6 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "cmake.sourceDirectory": "#{workspaceFolder}/perft_debugger_c_example",
+  "cmake.sourceDirectory": "/home/maniadeluxe/Programming/perft-debugger/perft_debugger_c_example",
   "cmake.buildDirectory": "${workspaceFolder}/perft_debugger_c_example/build/${buildType}",
 }
